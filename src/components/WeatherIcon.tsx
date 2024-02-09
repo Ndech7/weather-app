@@ -5,7 +5,7 @@ import { cn } from "@/utils/cn";
 type Props = {};
 
 const WeatherIcon = (
-  props: React.HTMLProps<HTMLDivElement> & { iconName: string }
+  props: React.HTMLProps<HTMLDivElement> & { iconname: string }
 ) => {
   return (
     <div {...props} className={cn("relative h-20 w-20", props.className)}>
@@ -14,7 +14,8 @@ const WeatherIcon = (
         height={100}
         alt="weather-icon"
         className="absolute h-full w-full"
-        src={`https://openweathermap.org/img/wn/${props.iconName}@4x.png`}
+        src={`https://openweathermap.org/img/wn/${props.iconname}@4x.png`}
+        priority
       />
     </div>
   );

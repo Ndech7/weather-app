@@ -10,6 +10,7 @@ import { getDayOrNightIcon } from "@/utils/getDayOrNightIcon";
 import WeatherDetail from "@/components/WeatherDetail";
 import { metersToKilometers } from "@/utils/metersToKilometers";
 import { convertWindSpeed } from "@/utils/convertWindSpeed";
+import ForecastWeatherDetail from "@/components/ForecastWeatherDetail";
 
 interface WeatherDetail {
   dt: number;
@@ -81,6 +82,23 @@ export default function Home() {
   const firstData = data?.list[0];
   console.log(data);
 
+  // getting the forecast data
+  const uniqueDates = [
+    ...new Set(
+      data?.list.map(
+        (entry) => new Date(entry.dt * 1000).toISOString().split("T")[0]
+      )
+    ),
+  ];
+  // filtering data to get the first entry after 6AM for each unique date
+  const firstDataForEachDate = uniqueDates.map((date) => {
+    return data?.list.find((entry) => {
+      const entryDate = new Date(entry.dt * 1000).toISOString().split("T")[0];
+      const entryTime = new Date(entry.dt * 1000).getHours();
+      return entryDate === date && entryTime >= 6;
+    });
+  });
+
   if (isLoading)
     return (
       <div className="flex items-center min-h-screen justify-center">
@@ -135,7 +153,7 @@ export default function Home() {
                       {format(parseISO(d.dt_txt), "h:mm a")}
                     </p>
                     <WeatherIcon
-                      iconName={getDayOrNightIcon(d.weather[0].icon, d.dt_txt)}
+                      iconname={getDayOrNightIcon(d.weather[0].icon, d.dt_txt)}
                     />
                     <p>{convertKelvinToCelcius(d?.main.temp ?? 0)}°</p>
                   </div>
@@ -150,7 +168,7 @@ export default function Home() {
                 {firstData?.weather[0].description}
               </p>
               <WeatherIcon
-                iconName={getDayOrNightIcon(
+                iconname={getDayOrNightIcon(
                   firstData?.weather[0].icon ?? "",
                   firstData?.dt_txt ?? ""
                 )}
@@ -178,6 +196,31 @@ export default function Home() {
         {/* 7 day forecast */}
         <section className="text-gray-500 flex w-full flex-col gap-4">
           <p className="text-2xl">Forecast (7 Days)</p>
+          {firstDataForEachDate.map((d, i) => (
+            <ForecastWeatherDetail
+              key={i}
+              weatherIcon={d?.weather[0].icon ?? "01d"}
+              description={d?.weather[0].description ?? ""}
+              date={format(parseISO(d?.dt_txt ?? ""), "dd.MM")}
+              day={format(parseISO(d?.dt_txt ?? ""), "EEEE")}
+              feels_like={d?.main.feels_like ?? 0}
+              temp={d?.main.temp ?? 0}
+              temp_min={d?.main?.temp_min ?? 0}
+              temp_max={d?.main?.temp_max ?? 0}
+              airPressure={`${d?.main.pressure} hPa`}
+              humidity={`${d?.main.humidity}%`}
+              sunrise={format(
+                fromUnixTime(data?.city.sunrise ?? 1707450152),
+                "H:mm"
+              )}
+              sunset={format(
+                fromUnixTime(data?.city.sunset ?? 1707493947),
+                "H:mm"
+              )}
+              visibility={`${metersToKilometers(d?.visibility ?? 10000)}km`}
+              windSpeed={`${convertWindSpeed(d?.wind.speed ?? 1.64)}`}
+            />
+          ))}
         </section>
       </main>
     </div>
