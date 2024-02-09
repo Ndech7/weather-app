@@ -2,11 +2,14 @@
 import Navbar from "@/components/Navbar";
 import axios from "axios";
 import { useQuery } from "react-query";
-import { format, parseISO } from "date-fns";
+import { format, fromUnixTime, parseISO } from "date-fns";
 import Container from "@/components/Container";
 import convertKelvinToCelcius from "@/utils/convertKelvinToCelcius";
 import WeatherIcon from "@/components/WeatherIcon";
 import { getDayOrNightIcon } from "@/utils/getDayOrNightIcon";
+import WeatherDetail from "@/components/WeatherDetail";
+import { metersToKilometers } from "@/utils/metersToKilometers";
+import { convertWindSpeed } from "@/utils/convertWindSpeed";
 
 interface WeatherDetail {
   dt: number;
@@ -139,11 +142,43 @@ export default function Home() {
                 ))}
               </div>
             </Container>
-            <div className=""></div>
+          </div>
+          <div className="text-gray-500 flex gap-4">
+            {/* left */}
+            <Container className="w-fit justify-center flex-col px-4 items-center">
+              <p className="capitalize text-center">
+                {firstData?.weather[0].description}
+              </p>
+              <WeatherIcon
+                iconName={getDayOrNightIcon(
+                  firstData?.weather[0].icon ?? "",
+                  firstData?.dt_txt ?? ""
+                )}
+              />
+            </Container>
+            {/* right */}
+            <Container className="bg-yellow-300/80 px-6 gap-4 justify-between overflow-x-auto">
+              <WeatherDetail
+                visibility={metersToKilometers(firstData?.visibility ?? 10000)}
+                airPressure={`${firstData?.main.pressure} hPa`}
+                humidity={`${firstData?.main.humidity}%`}
+                windSpeed={convertWindSpeed(firstData?.wind.speed ?? 0)}
+                sunrise={format(
+                  fromUnixTime(data?.city.sunrise ?? 1707450152),
+                  "H:mm"
+                )}
+                sunset={format(
+                  fromUnixTime(data?.city.sunset ?? 1707493947),
+                  "H:mm"
+                )}
+              />
+            </Container>
           </div>
         </section>
         {/* 7 day forecast */}
-        <section></section>
+        <section className="text-gray-500 flex w-full flex-col gap-4">
+          <p className="text-2xl">Forecast (7 Days)</p>
+        </section>
       </main>
     </div>
   );
