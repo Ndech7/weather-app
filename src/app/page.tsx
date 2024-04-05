@@ -70,7 +70,7 @@ interface WeatherData {
   };
 }
 
-export const apiKey = process.env.NEXT_PUBLIC_OPEN_WEATHER_KEY;
+const apiKey = process.env.NEXT_PUBLIC_OPEN_WEATHER_KEY;
 
 export default function Home() {
   //default city on app load

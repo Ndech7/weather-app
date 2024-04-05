@@ -4,11 +4,12 @@ import { IoPartlySunnyOutline } from "react-icons/io5";
 import { MdOutlineMyLocation, MdOutlineLocationOn } from "react-icons/md";
 import SearchBox from "./SearchBox";
 import axios from "axios";
-import { apiKey } from "@/app/page";
 import { useAtom } from "jotai";
 import { loadCityAtom, placeAtom } from "@/app/atom";
 
 type Props = { location?: string };
+
+const apiKey = process.env.NEXT_PUBLIC_OPEN_WEATHER_KEY;
 
 const SuggestionBox = ({
   showSuggestions,
